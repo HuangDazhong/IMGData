@@ -1,0 +1,57 @@
+ 
+ :row-selection="{ selectedRowKeys: selectedRowKeysList, onChange: onSelectChange }"
+
+
+
+
+<div style="text-align: center;margin-top:10px">
+          <a-button class="editable-add-btn" @click="copy">
+            复制
+          </a-button>
+           <a-button class="editable-add-btn" @click="paste">
+            粘贴
+          </a-button>
+</div>
+
+
+
+
+  selectedRowKeysList:[],
+      tempselectGoods:[],
+
+
+
+
+
+
+
+onSelectChange (rowKeys) {
+      this.selectedRowKeysList=rowKeys;
+      this.tempselectGoods=[];//清空缓存的选择结果
+      for(var i=0;i<rowKeys.length;i++){
+        var tempItem=this.data1[rowKeys[i]]
+         delete tempItem.id
+ this.tempselectGoods.push(this.data1[rowKeys[i]])
+      } //将选中的行加入缓存结果
+    },
+   copy(){
+var selectGoodsJson = JSON.stringify(this.tempselectGoods)  // 转换为字符串
+localStorage.setItem('selectedGoods',selectGoodsJson);//保存到浏览器
+ this.$message.success('复制成功')
+   },
+   paste(){
+   var newData= [...this.data1];
+   var  selectGoodsJson= localStorage.getItem('selectedGoods');//保存到浏览器
+   var selectGoods= JSON.parse(selectGoodsJson);
+    for(var i=0;i<selectGoods.length;i++){
+    //每条数据赋值新生成的ID
+    selectGoods[i].documentNo=this.defaultValue2.documentNo;
+    CollectionGoodsInfoAdd(selectGoods[i]).then(res => {
+            if (res.success) {
+              this.getAllData(this.$route.query.id, 2)
+            } else {
+              this.$message.error('新增失败') // + res.message
+            }
+          })
+      } //将选中的行加入缓存结果
+   },
